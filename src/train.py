@@ -16,7 +16,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-def train(step, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data):
+def train(step, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data, device):
     model.train()
 
     # update learning rate
@@ -30,7 +30,7 @@ def train(step, model, optimizer, lr_scheduler, mm_scheduler, transform_1, trans
     # forward
     optimizer.zero_grad()
 
-    x1, x2 = transform_1(data), transform_2(data)
+    x1, x2 = transform_1(data).to(device), transform_2(data).to(device)
 
     q1, y2 = model(x1, x2)
     q2, y1 = model(x2, x1)
@@ -95,7 +95,8 @@ def main(args):
     mm_scheduler = CosineDecayScheduler(1 - args.mm, 0, args.epochs)
 
     for epoch in tqdm(range(1, args.epochs + 1), desc='  - (Training)  '):
-        train_loss = train(epoch - 1, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data)
+        train_loss = train(epoch - 1, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data,
+                           device)
         if epoch % args.eval_epochs == 0:
             val_score = eval(epoch, model, dataset, device, args, train_masks, val_masks, test_masks)
             tqdm.write('Epoch: {:04d} | Train Loss: {:.4f} | Val Score: {:.4f}'.format(epoch, train_loss, val_score))
