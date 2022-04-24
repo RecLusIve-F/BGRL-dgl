@@ -99,14 +99,15 @@ def main(args):
     # train
     for epoch in tqdm(range(1, args.epochs + 1), desc='  - (Training)  '):
         train(epoch - 1, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data)
-        if epoch % args.eval_every == 0:
+        if epoch % args.eval_epochs == 0:
             eval_scores = eval(model, dataset, device, args, train_masks, val_masks, test_masks)
             print('Epoch: {:04d} | Eval Score: {:.4f}'.format(epoch, np.mean(eval_scores)))
 
     # save encoder weights
-    if not os.path.isdir(args.logdir):
-        os.mkdir(args.logdir)
-    torch.save({'model': model.online_encoder.state_dict()}, os.path.join(args.logdir, 'bgrl-{}.pt'.format(args.dataset)))
+    if not os.path.isdir(args.weights_dir):
+        os.mkdir(args.weights_dir)
+    torch.save({'model': model.online_encoder.state_dict()}, os.path.join(args.weights_dir,
+                                                                          'bgrl-{}.pt'.format(args.dataset)))
 
     # evaluate
     eval_score = eval(model, dataset, device, args, train_masks, val_masks, test_masks)
