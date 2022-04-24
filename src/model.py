@@ -25,7 +25,7 @@ class GCN(nn.Module):
         x = g.ndata['feat']
         for layer in self.layers:
             if isinstance(layer, GraphConv):
-                print(x.device, g.device, layer.device)
+                print(x.device, g.device, layer.weight.device)
                 x = layer(g, x)
             else:
                 x = layer(x)
