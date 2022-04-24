@@ -23,6 +23,7 @@ class GCN(nn.Module):
 
     def forward(self, g):
         x = g.ndata['feat']
+        print(x.device, g.device)
         for layer in self.layers:
             if isinstance(layer, GraphConv):
                 x = layer(g, x)
@@ -35,12 +36,4 @@ class GCN(nn.Module):
             if hasattr(layer, 'reset_parameters'):
                 layer.reset_parameters()
 
-
-if __name__ == '__main__':
-    with tqdm(total=100, desc='(T)') as pbar:
-        for epoch in range(1, 101):
-            loss = np.random.randint(0, 100)
-            pbar.set_postfix({'loss': loss})
-            pbar.update()
-            time.sleep(1)
 
