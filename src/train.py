@@ -30,7 +30,7 @@ def train(step, model, optimizer, lr_scheduler, mm_scheduler, transform_1, trans
     # forward
     optimizer.zero_grad()
 
-    x1, x2 = transform_1(data).to(device), transform_2(data).to(device)
+    x1, x2 = transform_1(data), transform_2(data)
 
     q1, y2 = model(x1, x2)
     q2, y1 = model(x2, x1)
@@ -76,6 +76,7 @@ def main(args):
 
     data = dataset[0]  # all data include one graph
     data = data.to(device)
+    data.ndata['feat'] = data.ndata['feat'].to(device)
 
     # prepare transforms
     transform_1 = get_graph_drop_transform(drop_edge_p=args.drop_edge_p_1, feat_mask_p=args.feat_mask_p_1)
