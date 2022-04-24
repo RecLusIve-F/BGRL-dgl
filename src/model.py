@@ -23,9 +23,9 @@ class GCN(nn.Module):
 
     def forward(self, g):
         x = g.ndata['feat']
-        print(x.device, g.device)
         for layer in self.layers:
             if isinstance(layer, GraphConv):
+                print(x.device, g.device, layer.device)
                 x = layer(g, x)
             else:
                 x = layer(x)
