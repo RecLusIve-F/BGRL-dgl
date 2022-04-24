@@ -117,7 +117,7 @@ if __name__ == '__main__':
     parser = ArgumentParser()
 
     parser.add_argument('--data_seed', type=int, default=1)
-    parser.add_argument('--num_eval_splits', type=int, default=1)
+    parser.add_argument('--num_eval_splits', type=int, default=20)
     parser.add_argument('--logdir', type=str, default='../weights')
 
     # Dataset.
@@ -130,7 +130,7 @@ if __name__ == '__main__':
     parser.add_argument('--predictor_hidden_size', type=int, default=512)
 
     # Training hyper-parameters.
-    parser.add_argument('--epochs', type=int, default=1)
+    parser.add_argument('--epochs', type=int, default=10000)
     parser.add_argument('--lr', type=float, default=1e-5)
     parser.add_argument('--weight_decay', type=float, default=1e-5)
     parser.add_argument('--mm', type=float, default=0.99)
