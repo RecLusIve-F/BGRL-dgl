@@ -81,8 +81,8 @@ def main(args):
     data.ndata['feat'] = data.ndata['feat'].to(device)
 
     # prepare transforms
-    transform_1 = get_graph_drop_transform(drop_edge_p=args.drop_edge_p_1, feat_mask_p=args.feat_mask_p_1)
-    transform_2 = get_graph_drop_transform(drop_edge_p=args.drop_edge_p_2, feat_mask_p=args.feat_mask_p_2)
+    transform_1 = get_graph_drop_transform(drop_edge_p=args.drop_edge_p[0], feat_mask_p=args.feat_mask_p[0])
+    transform_2 = get_graph_drop_transform(drop_edge_p=args.drop_edge_p[1], feat_mask_p=args.feat_mask_p[1])
 
     # build networks
     input_size, representation_size = data.ndata['feat'].size(1), args.graph_encoder_layer[-1]
@@ -138,10 +138,8 @@ if __name__ == '__main__':
     parser.add_argument('--lr_warmup_epochs', type=int, default=1000)
 
     # Augmentations.
-    parser.add_argument('--drop_edge_p_1', type=float, default=0.)
-    parser.add_argument('--drop_edge_p_2', type=float, default=0.)
-    parser.add_argument('--feat_mask_p_1', type=float, default=0.)
-    parser.add_argument('--feat_mask_p_2', type=float, default=0.)
+    parser.add_argument('--drop_edge_p', type=float, nargs='+', default=[0., 0.])
+    parser.add_argument('--feat_mask_p', type=float, nargs='+', default=[0., 0.])
 
     # Evaluation
     parser.add_argument('--eval_epochs', type=int, default=1000)

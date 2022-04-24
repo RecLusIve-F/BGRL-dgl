@@ -15,7 +15,7 @@ torch 1.10.2
 scikit-learn 1.0.2
 ```
 
-### Training usage
+### Usage
 
 ###### Dataset options
 
@@ -27,6 +27,23 @@ scikit-learn 1.0.2
 
 
 ###### Examples
+```bash
+# Transductive learning
+# coauthor_cs
+python main.py --dataset coauthor_cs --graph_encoder_layer 512 256 --drop_edge_p 0.3 0.2 --feat_mask_p 0.3 0.4
+
+# coauthor_physics
+python main.py --dataset coauthor_physics --graph_encoder_layer 256 128 --drop_edge_p 0.4 0.1 --feat_mask_p 0.1 0.4
+
+# wiki_cs
+python main.py --dataset wiki_cs --graph_encoder_layer 512 256 --drop_edge_p 0.2 0.3 --feat_mask_p 0.2 0.1 --lr 5e-4
+
+# amazon_photos
+python main.py --dataset amazon_photos --graph_encoder_layer 256 128 --drop_edge_p 0.4 0.1 --feat_mask_p 0.1 0.2 --lr 1e-4
+
+# amazon_computers
+python main.py --dataset amazon_computers --graph_encoder_layer 256 128 --drop_edge_p 0.5 0.4 --feat_mask_p 0.2 0.1 --lr 5e-4
+```
 
 ### Performance
 
