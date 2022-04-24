@@ -1,6 +1,5 @@
-import copy
 import os
-
+import copy
 import torch
 import numpy as np
 from tqdm import tqdm
@@ -76,7 +75,7 @@ def main(args):
     else:
         dataset, train_masks, val_masks, test_masks = get_wiki_cs()
 
-    data = dataset[0]  # all data include one graph
+    data = dataset[0]
     data = data.to(device)
     data.ndata['feat'] = data.ndata['feat'].to(device)
 
@@ -100,15 +99,18 @@ def main(args):
     # train
     for epoch in tqdm(range(1, args.epochs + 1), desc='  - (Training)  '):
         train(epoch - 1, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data)
-
-    # evaluate
-    eval_score = eval(model, dataset, device, args, train_masks, val_masks, test_masks)
-    print('Evaluation score mean: {:.4f}, score std: {:.4f}'.format(np.mean(eval_score), np.std(eval_score)))
+        if epoch % args.eval_every == 0:
+            eval_scores = eval(model, dataset, device, args, train_masks, val_masks, test_masks)
+            print('Epoch: {:04d} | Eval Score: {:.4f}'.format(epoch, np.mean(eval_scores)))
 
     # save encoder weights
     if not os.path.isdir(args.logdir):
         os.mkdir(args.logdir)
     torch.save({'model': model.online_encoder.state_dict()}, os.path.join(args.logdir, 'bgrl-{}.pt'.format(args.dataset)))
+
+    # evaluate
+    eval_score = eval(model, dataset, device, args, train_masks, val_masks, test_masks)
+    print('Evaluation score mean: {:.4f}, score std: {:.4f}'.format(np.mean(eval_score), np.std(eval_score)))
 
 
 if __name__ == '__main__':
@@ -116,33 +118,33 @@ if __name__ == '__main__':
 
     parser = ArgumentParser()
 
-    parser.add_argument('--data_seed', type=int, default=1)
-    parser.add_argument('--num_eval_splits', type=int, default=20)
-    parser.add_argument('--logdir', type=str, default='../weights')
-
-    # Dataset.
-    parser.add_argument('--dataset_dir', type=str, default='../data')
+    # Dataset options.
     parser.add_argument('--dataset', type=str, default='amazon_photos', choices=['coauthor_cs', 'coauthor_physics',
                                                                                  'amazon_photos', 'amazon_computers',
                                                                                  'wiki_cs', 'ppi'])
-    # Architecture.
+    parser.add_argument('--dataset_dir', type=str, default='../data')
+
+    # Model options.
     parser.add_argument('--graph_encoder_layer', type=int, nargs='+', default=[256, 128])
     parser.add_argument('--predictor_hidden_size', type=int, default=512)
 
-    # Training hyper-parameters.
+    # Training options.
     parser.add_argument('--epochs', type=int, default=10000)
     parser.add_argument('--lr', type=float, default=1e-5)
     parser.add_argument('--weight_decay', type=float, default=1e-5)
     parser.add_argument('--mm', type=float, default=0.99)
-
     parser.add_argument('--lr_warmup_epochs', type=int, default=1000)
+    parser.add_argument('--weights_dir', type=str, default='../weights')
 
-    # Augmentations.
+    # Augmentations options.
     parser.add_argument('--drop_edge_p', type=float, nargs='+', default=[0., 0.])
     parser.add_argument('--feat_mask_p', type=float, nargs='+', default=[0., 0.])
 
-    # Evaluation
-    parser.add_argument('--eval_epochs', type=int, default=1000)
+    # Evaluation options.
+    parser.add_argument('--eval_epochs', type=int, default=250)
+    parser.add_argument('--num_eval_splits', type=int, default=20)
+    parser.add_argument('--data_seed', type=int, default=1)
+
     args = parser.parse_args()
 
     main(args)
