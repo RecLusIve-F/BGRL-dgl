@@ -111,6 +111,11 @@ def main(args):
 
     # evaluate
     eval_score = eval(model, dataset, device, args, train_masks, val_masks, test_masks)
+    if not os.path.isdir('../results'):
+        os.mkdir('../results')
+    with open('../results/{}.txt'.format(args.dataset), 'w') as f:
+        f.write('{}, {}\n'.format(np.mean(eval_score), np.std(eval_score)))
+
     print('Evaluation score mean: {:.4f}, score std: {:.4f}'.format(np.mean(eval_score), np.std(eval_score)))
 
 
