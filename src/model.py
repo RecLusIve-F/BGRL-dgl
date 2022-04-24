@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 
 class GCN(nn.Module):
-    def __init__(self, layer_sizes, batch_norm=False, batch_norm_mm=0.99):
+    def __init__(self, layer_sizes, device, batch_norm=False, batch_norm_mm=0.99):
         super(GCN, self).__init__()
         self.input_size, self.representation_size = layer_sizes[0], layer_sizes[-1]
 
@@ -20,6 +20,8 @@ class GCN(nn.Module):
                 self.layers.append(LayerNorm(out_dim))
 
             self.layers.append(nn.PReLU())
+
+        self.layers = [i.to(device) for i in self.layers]
 
     def forward(self, g):
         x = g.ndata['feat']
