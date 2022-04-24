@@ -72,6 +72,7 @@ def compute_representations(net, dataset, device):
 
     if len(dataset) == 1:
         data = dataset[0]
+        data = data.to(device)
         with torch.no_grad():
             reps.append(net(data))
             labels.append(data.ndata['label'])
