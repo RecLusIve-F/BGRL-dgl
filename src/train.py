@@ -84,7 +84,7 @@ def main(args):
 
     # build networks
     input_size, representation_size = data.ndata['feat'].size(1), args.graph_encoder_layer[-1]
-    encoder = GCN([input_size] + args.graph_encoder_layer, batch_norm=True)
+    encoder = GCN([input_size] + args.graph_encoder_layer, batch_norm=True).to(device)
     predictor = MLP_Predictor(representation_size, representation_size, hidden_size=args.predictor_hidden_size)
     model = BGRL(encoder, predictor).to(device)
 
