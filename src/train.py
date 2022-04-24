@@ -16,7 +16,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-def train(step, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data, device):
+def train(step, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data):
     model.train()
 
     # update learning rate
@@ -96,8 +96,7 @@ def main(args):
     mm_scheduler = CosineDecayScheduler(1 - args.mm, 0, args.epochs)
 
     for epoch in tqdm(range(1, args.epochs + 1), desc='  - (Training)  '):
-        train_loss = train(epoch - 1, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data,
-                           device)
+        train_loss = train(epoch - 1, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data)
         if epoch % args.eval_epochs == 0:
             val_score = eval(epoch, model, dataset, device, args, train_masks, val_masks, test_masks)
             tqdm.write('Epoch: {:04d} | Train Loss: {:.4f} | Val Score: {:.4f}'.format(epoch, train_loss, val_score))
@@ -121,7 +120,7 @@ if __name__ == '__main__':
     parser.add_argument('--predictor_hidden_size', type=int, default=512)
 
     # Training hyper-parameters.
-    parser.add_argument('--epochs', type=int, default=10000)
+    parser.add_argument('--epochs', type=int, default=1)
     parser.add_argument('--lr', type=float, default=1e-5)
     parser.add_argument('--weight_decay', type=float, default=1e-5)
     parser.add_argument('--mm', type=float, default=0.99)
@@ -135,8 +134,9 @@ if __name__ == '__main__':
     parser.add_argument('--feat_mask_p_2', type=float, default=0.1)
 
     # Evaluation
-    parser.add_argument('--eval_epochs', type=int, default=5)
+    parser.add_argument('--eval_epochs', type=int, default=1)
     args = parser.parse_args()
 
     main(args)
+
 

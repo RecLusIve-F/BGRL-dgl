@@ -1,6 +1,5 @@
 import numpy as np
 from sklearn import metrics
-from sklearn.datasets import make_classification
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV, ShuffleSplit, train_test_split
 from sklearn.multiclass import OneVsRestClassifier
