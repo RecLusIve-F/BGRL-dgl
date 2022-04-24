@@ -15,9 +15,8 @@ def fit_logistic_regression(X, y, data_random_seed=1, repeat=1):
     # normalize x
     X = normalize(X, norm='l2')
 
-    # set random state
-    rng = np.random.RandomState(data_random_seed)  # this will ensure the dataset will be split exactly the same
-                                                   # throughout training
+    # set random state, this will ensure the dataset will be split exactly the same throughout training
+    rng = np.random.RandomState(data_random_seed)
 
     accuracies = []
     for _ in range(repeat):

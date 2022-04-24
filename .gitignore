@@ -1,4 +1,5 @@
 .idea
 data
 __pycache__
+weights
 .DS_Store

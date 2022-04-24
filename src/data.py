@@ -1,7 +1,6 @@
-import itertools
-import json
-
 import dgl
+import json
+import itertools
 import numpy as np
 import torch
 from dgl.data import CoauthorCSDataset, CoauthorPhysicsDataset, AmazonCoBuyPhotoDataset, AmazonCoBuyComputerDataset

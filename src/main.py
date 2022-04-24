@@ -1,4 +1,6 @@
 import copy
+import os
+
 import torch
 import numpy as np
 from tqdm import tqdm
@@ -46,7 +48,7 @@ def train(step, model, optimizer, lr_scheduler, mm_scheduler, transform_1, trans
     return loss.item()
 
 
-def eval(epoch, model, dataset, device, args, train_masks=None, val_masks=None, test_masks=None):
+def eval(model, dataset, device, args, train_masks=None, val_masks=None, test_masks=None):
     # make temporary copy of encoder
     tmp_encoder = copy.deepcopy(model.online_encoder).eval()
     representations, labels = compute_representations(tmp_encoder, dataset, device)
@@ -58,7 +60,7 @@ def eval(epoch, model, dataset, device, args, train_masks=None, val_masks=None, 
         scores = fit_logistic_regression_preset_splits(representations.cpu().numpy(), labels.cpu().numpy(),
                                                        train_masks, val_masks, test_masks)
 
-    return np.mean(scores)
+    return scores
 
 
 def main(args):
@@ -84,7 +86,7 @@ def main(args):
 
     # build networks
     input_size, representation_size = data.ndata['feat'].size(1), args.graph_encoder_layer[-1]
-    encoder = GCN([input_size] + args.graph_encoder_layer, device, batch_norm=True)
+    encoder = GCN([input_size] + args.graph_encoder_layer, batch_norm=True)
     predictor = MLP_Predictor(representation_size, representation_size, hidden_size=args.predictor_hidden_size)
     model = BGRL(encoder, predictor).to(device)
 
@@ -95,11 +97,18 @@ def main(args):
     lr_scheduler = CosineDecayScheduler(args.lr, args.lr_warmup_epochs, args.epochs)
     mm_scheduler = CosineDecayScheduler(1 - args.mm, 0, args.epochs)
 
+    # train
     for epoch in tqdm(range(1, args.epochs + 1), desc='  - (Training)  '):
-        train_loss = train(epoch - 1, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data)
-        if epoch % args.eval_epochs == 0:
-            val_score = eval(epoch, model, dataset, device, args, train_masks, val_masks, test_masks)
-            tqdm.write('Epoch: {:04d} | Train Loss: {:.4f} | Val Score: {:.4f}'.format(epoch, train_loss, val_score))
+        train(epoch - 1, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data)
+
+    # evaluate
+    eval_score = eval(model, dataset, device, args, train_masks, val_masks, test_masks)
+    print('Evaluation score mean: {:.4f}, score std: {:.4f}'.format(np.mean(eval_score), np.std(eval_score)))
+
+    # save encoder weights
+    if not os.path.isdir(args.logdir):
+        os.mkdir(args.logdir)
+    torch.save({'model': model.online_encoder.state_dict()}, os.path.join(args.logdir, 'bgrl-{}.pt'.format(args.dataset)))
 
 
 if __name__ == '__main__':
@@ -108,7 +117,8 @@ if __name__ == '__main__':
     parser = ArgumentParser()
 
     parser.add_argument('--data_seed', type=int, default=1)
-    parser.add_argument('--num_eval_splits', type=int, default=3)
+    parser.add_argument('--num_eval_splits', type=int, default=1)
+    parser.add_argument('--logdir', type=str, default='../weights')
 
     # Dataset.
     parser.add_argument('--dataset_dir', type=str, default='../data')
@@ -128,13 +138,13 @@ if __name__ == '__main__':
     parser.add_argument('--lr_warmup_epochs', type=int, default=1000)
 
     # Augmentations.
-    parser.add_argument('--drop_edge_p_1', type=float, default=0.1)
-    parser.add_argument('--drop_edge_p_2', type=float, default=0.1)
-    parser.add_argument('--feat_mask_p_1', type=float, default=0.1)
-    parser.add_argument('--feat_mask_p_2', type=float, default=0.1)
+    parser.add_argument('--drop_edge_p_1', type=float, default=0.)
+    parser.add_argument('--drop_edge_p_2', type=float, default=0.)
+    parser.add_argument('--feat_mask_p_1', type=float, default=0.)
+    parser.add_argument('--feat_mask_p_2', type=float, default=0.)
 
     # Evaluation
-    parser.add_argument('--eval_epochs', type=int, default=1)
+    parser.add_argument('--eval_epochs', type=int, default=1000)
     args = parser.parse_args()
 
     main(args)
