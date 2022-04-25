@@ -11,8 +11,8 @@ def get_dataset(root, name, transform=NormalizeFeatures()):
     dgl_dataset_dict = {
         'coauthor_cs': CoauthorCSDataset,
         'coauthor_physics': CoauthorPhysicsDataset,
-        'amazon_computers': AmazonCoBuyPhotoDataset,
-        'amazon_photos': AmazonCoBuyComputerDataset,
+        'amazon_computers': AmazonCoBuyComputerDataset,
+        'amazon_photos': AmazonCoBuyPhotoDataset,
     }
 
     dataset_class = dgl_dataset_dict[name]
