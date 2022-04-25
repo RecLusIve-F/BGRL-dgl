@@ -86,7 +86,7 @@ python main.py --dataset ppi --drop_edge_p 0.3 0.25 --feat_mask_p 0.25 0. --lr 5
 |        DGL        |              |              |              | 92.81 ± 0.01 | 95.56 ± 0.00 |
 
 ## Inductive Task
-|       Dataset        |     PPI      |
-| :------------------: | :----------: |
-| Micro-$F_1$ Reported | 69.41 ± 0.15 |
-|         DGL          |              |
+|      Dataset      |     PPI      |
+| :---------------: | :----------: |
+| Micro-F1 Reported | 69.41 ± 0.15 |
+|        DGL        |              |
