@@ -19,8 +19,11 @@ def get_dataset(root, name, transform=NormalizeFeatures()):
     }
 
     dataset_class = dgl_dataset_dict[name]
+    dataset = dataset_class(root, transform=transform)
+    if name != 'ppi':
+        dataset = [dataset, None, None, None]
 
-    return dataset_class(root, transform=transform)
+    return dataset
 
 
 def get_wiki_cs(root, transform=NormalizeFeatures()):

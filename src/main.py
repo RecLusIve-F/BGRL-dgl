@@ -58,7 +58,7 @@ def eval(model, dataset, device, args, train_masks=None, val_masks=None, test_ma
         train_data = compute_representations(tmp_encoder, train_masks, device)
         val_data = compute_representations(tmp_encoder, val_masks, device)
         test_data = compute_representations(tmp_encoder, test_masks, device)
-        num_classes = train_data[0].shape[1]
+        num_classes = train_data[1].shape[1]
         val_scores, test_scores = fit_ppi_linear(num_classes, train_data, val_data, test_data, device,
                                                  args.num_eval_splits)
     elif args.dataset != 'wiki_cs':
@@ -104,7 +104,7 @@ def main(args):
     val_scores, test_scores = [], []
     # train
     for epoch in tqdm(range(1, args.epochs + 1), desc='  - (Training)  '):
-        train(epoch - 1, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data)
+        # train(epoch - 1, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data)
         if epoch % args.eval_epochs == 0:
             val_scores, test_scores = eval(model, dataset, device, args, train_masks, val_masks, test_masks)
             if args.dataset == 'ppi':
@@ -137,7 +137,7 @@ if __name__ == '__main__':
     parser.add_argument('--dataset_dir', type=str, default='../data')
 
     # Model options.
-    parser.add_argument('--graph_encoder_layer', type=int, nargs='+', default=[512, 512])
+    parser.add_argument('--graph_encoder_layer', type=int, nargs='+', default=[256, 128])
     parser.add_argument('--predictor_hidden_size', type=int, default=512)
 
     # Training options.
