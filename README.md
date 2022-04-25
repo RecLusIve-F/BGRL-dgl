@@ -81,13 +81,15 @@ python main.py --dataset ppi --graph_encoder_layer 512 512 --drop_edge_p 0.3 0.2
 ### Performance
 
 ##### Transductive Task
-|      Dataset      | WikiCS | Am. Comp. | Am. Photos | Co. CS | Co. Phy |
-| :---------------: | :----: | :-------: | :--------: | :----: | :-----: |
-| Accuracy Reported | 79.98  |   90.34   |   93.17    | 93.31  |  95.73  |
-|        DGL        | 78.54  |   89.79   |   92.72    | 92.81  |  95.56  |
+|        Dataset         | WikiCS | Am. Comp. | Am. Photos | Co. CS | Co. Phy |
+| :--------------------: | :----: | :-------: | :--------: | :----: | :-----: |
+|   Accuracy Reported    | 79.98  |   90.34   |   93.17    | 93.31  |  95.73  |
+| Accuracy Official code |        |           |            | 93.42  |         |
+|      Accuracy DGL      | 78.54  |   89.79   |   92.72    | 92.81  |  95.56  |
 
 ##### Inductive Task
-|      Dataset      |  PPI  |
-| :---------------: | :---: |
-| Micro-F1 Reported | 69.41 |
-|        DGL        |       |
+|        Dataset         |  PPI  |
+| :--------------------: | :---: |
+|   Micro-F1 Reported    | 69.41 |
+| Micro-F1 Official code |       |
+|      Micro-F1 DGL      |       |

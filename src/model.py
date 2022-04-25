@@ -25,18 +25,21 @@ class LayerNorm(nn.Module):
         zeros_(self.bias)
 
     def forward(self, x, batch=None):
+        device = x.device
         if batch is None:
             x = x - x.mean()
             out = x / (x.std(unbiased=False) + self.eps)
         else:
             batch_size = int(batch.max()) + 1
             batch_idx = [batch == i for i in range(batch_size)]
-            norm = torch.tensor([i.sum() for i in batch_idx], dtype=x.dtype).clamp_(min=1)
+            norm = torch.tensor([i.sum() for i in batch_idx], dtype=x.dtype).clamp_(min=1).to(device)
             norm = norm.mul_(x.size(-1)).view(-1, 1)
             tmp_list = [x[i] for i in batch_idx]
-            mean = torch.concat([i.sum(0).unsqueeze(0) for i in tmp_list], dim=0).sum(dim=-1, keepdim=True) / norm
+            mean = torch.concat([i.sum(0).unsqueeze(0) for i in tmp_list], dim=0).sum(dim=-1, keepdim=True).to(device)
+            mean = mean / norm
             x = x - mean.index_select(0, batch.long())
-            var = torch.concat([(i * i).sum(0).unsqueeze(0) for i in tmp_list], dim=0).sum(dim=-1, keepdim=True) / norm
+            var = torch.concat([(i * i).sum(0).unsqueeze(0) for i in tmp_list], dim=0).sum(dim=-1, keepdim=True).to(device)
+            var = var / norm
             out = x / (var + self.eps).sqrt().index_select(0, batch.long())
 
         if self.weight is not None and self.bias is not None:
