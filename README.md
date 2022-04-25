@@ -83,10 +83,10 @@ python main.py --dataset ppi --drop_edge_p 0.3 0.25 --feat_mask_p 0.25 0. --lr 5
 |      Dataset      | WikiCS | Am. Comp. | Am. Photos | Co. CS | Co. Phy |
 | :---------------: | :----: | :-------: | :--------: | :----: | :-----: |
 | Accuracy Reported | 79.98  |   90.34   |   93.17    | 93.31  |  95.73  |
-|        DGL        |        |   89.79   |   92.72    | 92.81  |  95.56  |
+|        DGL        | 78.54  |   89.79   |   92.72    | 92.81  |  95.56  |
 
 ## Inductive Task
-|      Dataset      |     PPI      |
-| :---------------: | :----------: |
-| Micro-F1 Reported | 69.41 ± 0.15 |
-|        DGL        |              |
+|      Dataset      |  PPI  |
+| :---------------: | :---: |
+| Micro-F1 Reported | 69.41 |
+|        DGL        |       |
