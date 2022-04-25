@@ -49,6 +49,7 @@ def get_wiki_cs(root, transform=NormalizeFeatures()):
 def get_ppi(root, transform=None):
     train_dataset = PPIDataset(mode='train', raw_dir=root)
     val_dataset = PPIDataset(mode='valid', raw_dir=root)
+    test_dataset = PPIDataset(mode='test', raw_dir=root)
     train_val_dataset = [i for i in train_dataset] + [i for i in val_dataset]
     for idx, data in enumerate(train_val_dataset):
         data.ndata['batch'] = torch.zeros(data.number_of_nodes()) + idx
@@ -56,5 +57,5 @@ def get_ppi(root, transform=None):
 
     g = list(GraphDataLoader(train_val_dataset, batch_size=22, shuffle=True))
 
-    return g, PPIDataset(mode='train', raw_dir=root), PPIDataset(mode='valid', raw_dir=root), PPIDataset(mode='test', raw_dir=root)
+    return g, PPIDataset(mode='train', raw_dir=root), PPIDataset(mode='valid', raw_dir=root), test_dataset
 

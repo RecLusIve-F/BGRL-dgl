@@ -58,7 +58,7 @@ def eval(model, dataset, device, args, train_masks=None, val_masks=None, test_ma
         train_data = compute_representations(tmp_encoder, train_masks, device)
         val_data = compute_representations(tmp_encoder, val_masks, device)
         test_data = compute_representations(tmp_encoder, test_masks, device)
-        num_classes = len(np.unique(train_data[1].cpu().numpy()))
+        num_classes = train_data[0].shape[1]
         val_scores, test_scores = fit_ppi_linear(num_classes, train_data, val_data, test_data, device,
                                                  args.num_eval_splits)
     elif args.dataset != 'wiki_cs':
