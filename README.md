@@ -26,7 +26,7 @@ scikit-learn 1.0.2
 ##### Model options
 ```
 --graph_encoder_layer         list        Convolutional layer sizes.           Default is [256, 128].
---predictor_hidden_size       int         Hidden size of projector.            Default is 512.
+--predictor_hidden_size       int         Hidden size of predictor.            Default is 512.
 ```
 
 ##### Training options
@@ -40,7 +40,7 @@ scikit-learn 1.0.2
 ```
 
 ##### Augmentations options
-```bash
+```
 --drop_edge_p                 float      Probability of edge dropout.          Default is [0., 0.].
 --feat_mask_p                 float      Probability of node feature masking.  Default is [0., 0.].
 ```
@@ -79,13 +79,14 @@ python main.py --dataset ppi --drop_edge_p 0.3 0.25 --feat_mask_p 0.25 0. --lr 5
 ```
 
 ### Performance
-## Transductive Task
+
+##### Transductive Task
 |      Dataset      | WikiCS | Am. Comp. | Am. Photos | Co. CS | Co. Phy |
 | :---------------: | :----: | :-------: | :--------: | :----: | :-----: |
 | Accuracy Reported | 79.98  |   90.34   |   93.17    | 93.31  |  95.73  |
 |        DGL        | 78.54  |   89.79   |   92.72    | 92.81  |  95.56  |
 
-## Inductive Task
+##### Inductive Task
 |      Dataset      |  PPI  |
 | :---------------: | :---: |
 | Micro-F1 Reported | 69.41 |
