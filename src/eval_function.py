@@ -80,7 +80,7 @@ def fit_logistic_regression_preset_splits(X, y, train_masks, val_masks, test_mas
     return accuracies
 
 
-def fit_ppi_linear(num_classes, train_data, val_data, test_data, device):
+def fit_ppi_linear(num_classes, train_data, val_data, test_data, device, repeat=1):
     r"""
         Trains a linear layer on top of the representations. This function is specific to the PPI dataset,
         which has multiple labels.
@@ -122,16 +122,21 @@ def fit_ppi_linear(num_classes, train_data, val_data, test_data, device):
     val_data[0] = (val_data[0] - mean) / std
     test_data[0] = (test_data[0] - mean) / std
 
-    best_val_f1 = 0
-    test_f1 = 0
-    for weight_decay in 2.0 ** np.arange(-10, 11, 2):
-        classifier = torch.nn.Linear(num_feats, num_classes).to(device)
-        optimizer = torch.optim.AdamW(params=classifier.parameters(), lr=0.01, weight_decay=weight_decay)
+    best_val_f1 = []
+    test_f1 = []
+    for _ in range(repeat):
+        tmp_best_val_f1 = 0
+        tmp_test_f1 = 0
+        for weight_decay in 2.0 ** np.arange(-10, 11, 2):
+            classifier = torch.nn.Linear(num_feats, num_classes).to(device)
+            optimizer = torch.optim.AdamW(params=classifier.parameters(), lr=0.01, weight_decay=weight_decay)
 
-        train(classifier, train_data, optimizer)
-        val_f1 = test(classifier, val_data)
-        if val_f1 > best_val_f1:
-            best_val_f1 = val_f1
-            test_f1 = test(classifier, test_data)
+            train(classifier, train_data, optimizer)
+            val_f1 = test(classifier, val_data)
+            if val_f1 > tmp_best_val_f1:
+                tmp_best_val_f1 = val_f1
+                tmp_test_f1 = test(classifier, test_data)
+        best_val_f1.append(tmp_best_val_f1)
+        test_f1.append(tmp_test_f1)
 
-    return best_val_f1, test_f1
+    return [best_val_f1], [test_f1]

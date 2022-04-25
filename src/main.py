@@ -58,7 +58,9 @@ def eval(model, dataset, device, args, train_masks=None, val_masks=None, test_ma
         train_data = compute_representations(tmp_encoder, train_masks, device)
         val_data = compute_representations(tmp_encoder, val_masks, device)
         test_data = compute_representations(tmp_encoder, test_masks, device)
-        val_scores, test_scores = fit_ppi_linear(121, train_data, val_data, test_data, device)
+        num_classes = len(np.unique(train_data[1].cpu().numpy()))
+        val_scores, test_scores = fit_ppi_linear(num_classes, train_data, val_data, test_data, device,
+                                                 args.num_eval_splits)
     elif args.dataset != 'wiki_cs':
         test_scores = fit_logistic_regression(representations.cpu().numpy(), labels.cpu().numpy(),
                                               data_random_seed=args.data_seed, repeat=args.num_eval_splits)
@@ -106,7 +108,8 @@ def main(args):
         if epoch % args.eval_epochs == 0:
             val_scores, test_scores = eval(model, dataset, device, args, train_masks, val_masks, test_masks)
             if args.dataset == 'ppi':
-                print('Epoch: {:04d} | Best Val F1: {:.4f} | Test F1: {:.4f}'.format(epoch, val_scores, test_scores))
+                print('Epoch: {:04d} | Best Val F1: {:.4f} | Test F1: {:.4f}'.format(epoch, np.mean(val_scores),
+                                                                                     np.mean(test_scores)))
             else:
                 print('Epoch: {:04d} | Test Accuracy: {:.4f}'.format(epoch, np.mean(test_scores)))
 
