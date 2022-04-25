@@ -8,7 +8,7 @@ Contributor: [RecLusIve-F](https://github.com/RecLusIve-F)
 
 The codebase is implemented in Python 3.8. For version requirement of packages, see below.
 
-```bash
+```
 dgl 0.8.1
 numpy 1.21.2
 torch 1.10.2
@@ -18,19 +18,19 @@ scikit-learn 1.0.2
 ### Usage
 
 ##### Dataset options
-```bash
+```
 --dataset                     str         The graph dataset name.              Default is 'Amazon Photos'.
 --dataset_dir                 str         Where the dataset resides.           Default is '../data'.
 ```
 
 ##### Model options
-```bash
+```
 --graph_encoder_layer         list        Convolutional layer sizes.           Default is [256, 128].
 --predictor_hidden_size       int         Hidden size of projector.            Default is 512.
 ```
 
 ##### Training options
-```bash
+```
 --epochs                      int         The number of training epochs.       Default is 10000.
 --lr                          float       The learning rate.                   Default is 0.00001.
 --weight_decay                float       The weight decay.                    Default is 0.00001.
@@ -46,7 +46,7 @@ scikit-learn 1.0.2
 ```
 
 ##### Evaluation options
-```bash
+```
 --eval_epochs                 int        Evaluate every eval_epochs.          Default is 250.
 --num_eval_splits             int        Number of evaluation splits.         Default is 20.
 --data_seed                   int        Data split seed for evaluation.      Default is 1.
@@ -55,7 +55,7 @@ scikit-learn 1.0.2
 ### Instructions for experiments
 
 ##### Transductive task
-```bash
+```
 # Coauthor CS
 python main.py --dataset coauthor_cs --graph_encoder_layer 512 256 --drop_edge_p 0.3 0.2 --feat_mask_p 0.3 0.4
 
@@ -73,7 +73,7 @@ python main.py --dataset amazon_computers --graph_encoder_layer 256 128 --drop_e
 ```
 
 ##### Inductive task
-```bash
+```
 # PPI
 python main.py --dataset ppi --drop_edge_p 0.3 0.25 --feat_mask_p 0.25 0. --lr 5e-3
 ```
@@ -83,7 +83,7 @@ python main.py --dataset ppi --drop_edge_p 0.3 0.25 --feat_mask_p 0.25 0. --lr 5
 |      Dataset      |    WikiCS    |  Am. Comp.   |  Am. Photos  |    Co. CS    |   Co. Phy    |
 | :---------------: | :----------: | :----------: | :----------: | :----------: | :----------: |
 | Accuracy Reported | 79.98 ± 0.10 | 90.34 ± 0.19 | 93.17 ± 0.30 | 93.31 ± 0.13 | 95.73 ± 0.05 |
-|        DGL        |              |              |              | 92.81 ± 0.01 |              |
+|        DGL        |              |              |              | 92.81 ± 0.01 | 95.56 ± 0.00 |
 
 ## Inductive Task
 |       Dataset        |     PPI      |
