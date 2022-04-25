@@ -54,13 +54,6 @@ class BGRL(nn.Module):
         return online_q, target_y
 
 
-def load_trained_encoder(encoder, ckpt_path, device):
-    r"""Utility for loading the trained encoder."""
-    checkpoint = torch.load(ckpt_path, map_location=device)
-    encoder.load_state_dict(checkpoint['model'], strict=True)
-    return encoder.to(device)
-
-
 def compute_representations(net, dataset, device):
     r"""Pre-computes the representations for the entire data.
     Returns:

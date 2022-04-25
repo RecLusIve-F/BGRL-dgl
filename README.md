@@ -75,7 +75,7 @@ python main.py --dataset amazon_computers --graph_encoder_layer 256 128 --drop_e
 ##### Inductive task
 ```
 # PPI
-python main.py --dataset ppi --drop_edge_p 0.3 0.25 --feat_mask_p 0.25 0. --lr 5e-3
+python main.py --dataset ppi --graph_encoder_layer 512 512 --drop_edge_p 0.3 0.25 --feat_mask_p 0.25 0. --lr 5e-3
 ```
 
 ### Performance

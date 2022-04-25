@@ -1,12 +1,6 @@
 .idea
-data/amazon_co_buy_computer
-data/amazon_co_buy_photo
-data/coauthor_cs
-data/coauthor_physics
-data/amazon_co_buy_computer.zip
-data/amazon_co_buy_photo.zip
-data/coauthor_cs.zip
-data/coauthor_physics.zip
+data
 __pycache__
 weights
+results
 .DS_Store

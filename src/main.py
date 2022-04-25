@@ -3,15 +3,16 @@ import copy
 import torch
 import numpy as np
 from tqdm import tqdm
-from model import GCN
+from data import get_dataset
 from torch.optim import AdamW
 from predictors import MLP_Predictor
-from data import get_dataset, get_wiki_cs
+from model import GCN, GraphSAGE_GCN
 from scheduler import CosineDecayScheduler
 from BGRL import BGRL, compute_representations
 from transforms import get_graph_drop_transform
 from torch.nn.functional import cosine_similarity
-from logistic_regression_eval import fit_logistic_regression, fit_logistic_regression_preset_splits
+from eval_function import fit_logistic_regression, fit_logistic_regression_preset_splits, fit_ppi_linear
+
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -51,15 +52,21 @@ def eval(model, dataset, device, args, train_masks=None, val_masks=None, test_ma
     # make temporary copy of encoder
     tmp_encoder = copy.deepcopy(model.online_encoder).eval()
     representations, labels = compute_representations(tmp_encoder, dataset, device)
+    val_scores = None
 
-    if args.dataset != 'wiki_cs':
-        scores = fit_logistic_regression(representations.cpu().numpy(), labels.cpu().numpy(),
-                                         data_random_seed=args.data_seed, repeat=args.num_eval_splits)
+    if args.dataset == 'ppi':
+        train_data = compute_representations(tmp_encoder, train_masks, device)
+        val_data = compute_representations(tmp_encoder, val_masks, device)
+        test_data = compute_representations(tmp_encoder, test_masks, device)
+        val_scores, test_scores = fit_ppi_linear(121, train_data, val_data, test_data, device)
+    elif args.dataset != 'wiki_cs':
+        test_scores = fit_logistic_regression(representations.cpu().numpy(), labels.cpu().numpy(),
+                                              data_random_seed=args.data_seed, repeat=args.num_eval_splits)
     else:
-        scores = fit_logistic_regression_preset_splits(representations.cpu().numpy(), labels.cpu().numpy(),
-                                                       train_masks, val_masks, test_masks)
+        test_scores = fit_logistic_regression_preset_splits(representations.cpu().numpy(), labels.cpu().numpy(),
+                                                            train_masks, val_masks, test_masks)
 
-    return scores
+    return val_scores, test_scores
 
 
 def main(args):
@@ -67,17 +74,10 @@ def main(args):
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     print('Using device:', device)
 
-    train_masks, val_masks, test_masks = None, None, None
-
-    # load data
-    if args.dataset != 'wiki_cs':
-        dataset = get_dataset(args.dataset_dir, args.dataset)
-    else:
-        dataset, train_masks, val_masks, test_masks = get_wiki_cs()
+    dataset, train_masks, val_masks, test_masks = get_dataset(args.dataset_dir, args.dataset)
 
     data = dataset[0]
     data = data.to(device)
-    data.ndata['feat'] = data.ndata['feat'].to(device)
 
     # prepare transforms
     transform_1 = get_graph_drop_transform(drop_edge_p=args.drop_edge_p[0], feat_mask_p=args.feat_mask_p[0])
@@ -85,7 +85,10 @@ def main(args):
 
     # build networks
     input_size, representation_size = data.ndata['feat'].size(1), args.graph_encoder_layer[-1]
-    encoder = GCN([input_size] + args.graph_encoder_layer, batch_norm=True)
+    if args.dataset == 'ppi':
+        encoder = GraphSAGE_GCN([input_size] + args.graph_encoder_layer)
+    else:
+        encoder = GCN([input_size] + args.graph_encoder_layer)
     predictor = MLP_Predictor(representation_size, representation_size, hidden_size=args.predictor_hidden_size)
     model = BGRL(encoder, predictor).to(device)
 
@@ -96,12 +99,16 @@ def main(args):
     lr_scheduler = CosineDecayScheduler(args.lr, args.lr_warmup_epochs, args.epochs)
     mm_scheduler = CosineDecayScheduler(1 - args.mm, 0, args.epochs)
 
+    val_scores, test_scores = [], []
     # train
     for epoch in tqdm(range(1, args.epochs + 1), desc='  - (Training)  '):
         train(epoch - 1, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data)
         if epoch % args.eval_epochs == 0:
-            eval_scores = eval(model, dataset, device, args, train_masks, val_masks, test_masks)
-            print('Epoch: {:04d} | Eval Score: {:.4f}'.format(epoch, np.mean(eval_scores)))
+            val_scores, test_scores = eval(model, dataset, device, args, train_masks, val_masks, test_masks)
+            if args.dataset == 'ppi':
+                print('Epoch: {:04d} | Best Val F1: {:.4f} | Test F1: {:.4f}'.format(epoch, val_scores, test_scores))
+            else:
+                print('Epoch: {:04d} | Test Accuracy: {:.4f}'.format(epoch, np.mean(test_scores)))
 
     # save encoder weights
     if not os.path.isdir(args.weights_dir):
@@ -109,14 +116,10 @@ def main(args):
     torch.save({'model': model.online_encoder.state_dict()}, os.path.join(args.weights_dir,
                                                                           'bgrl-{}.pt'.format(args.dataset)))
 
-    # evaluate
-    eval_score = eval(model, dataset, device, args, train_masks, val_masks, test_masks)
     if not os.path.isdir('../results'):
         os.mkdir('../results')
     with open('../results/{}.txt'.format(args.dataset), 'w') as f:
-        f.write('{}, {}\n'.format(np.mean(eval_score), np.std(eval_score)))
-
-    print('Evaluation score mean: {:.4f}, score std: {:.4f}'.format(np.mean(eval_score), np.std(eval_score)))
+        f.write('{}, {}\n'.format(np.mean(test_scores), np.std(test_scores)))
 
 
 if __name__ == '__main__':
@@ -131,7 +134,7 @@ if __name__ == '__main__':
     parser.add_argument('--dataset_dir', type=str, default='../data')
 
     # Model options.
-    parser.add_argument('--graph_encoder_layer', type=int, nargs='+', default=[256, 128])
+    parser.add_argument('--graph_encoder_layer', type=int, nargs='+', default=[512, 512])
     parser.add_argument('--predictor_hidden_size', type=int, default=512)
 
     # Training options.
@@ -154,5 +157,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(args)
-
 
