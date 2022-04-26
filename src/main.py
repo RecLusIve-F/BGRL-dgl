@@ -5,12 +5,11 @@ import numpy as np
 from tqdm import tqdm
 from data import get_dataset
 from torch.optim import AdamW
-from predictors import MLP_Predictor
-from model import GCN, GraphSAGE_GCN
 from scheduler import CosineDecayScheduler
 from BGRL import BGRL, compute_representations
 from transforms import get_graph_drop_transform
 from torch.nn.functional import cosine_similarity
+from model import GCN, GraphSAGE_GCN, MLP_Predictor
 from eval_function import fit_logistic_regression, fit_logistic_regression_preset_splits, fit_ppi_linear
 
 
@@ -118,11 +117,6 @@ def main(args):
         os.mkdir(args.weights_dir)
     torch.save({'model': model.online_encoder.state_dict()}, os.path.join(args.weights_dir,
                                                                           'bgrl-{}.pt'.format(args.dataset)))
-
-    if not os.path.isdir('../results'):
-        os.mkdir('../results')
-    with open('../results/{}.txt'.format(args.dataset), 'w') as f:
-        f.write('{}, {}\n'.format(np.mean(test_scores), np.std(test_scores)))
 
 
 if __name__ == '__main__':

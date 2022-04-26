@@ -8,24 +8,6 @@ from dgl.dataloading import GraphDataLoader
 from dgl.data import CoauthorCSDataset, CoauthorPhysicsDataset, AmazonCoBuyPhotoDataset, AmazonCoBuyComputerDataset, PPIDataset
 
 
-def get_dataset(root, name, transform=NormalizeFeatures()):
-    dgl_dataset_dict = {
-        'coauthor_cs': CoauthorCSDataset,
-        'coauthor_physics': CoauthorPhysicsDataset,
-        'amazon_computers': AmazonCoBuyComputerDataset,
-        'amazon_photos': AmazonCoBuyPhotoDataset,
-        'wiki_cs': get_wiki_cs,
-        'ppi': get_ppi
-    }
-
-    dataset_class = dgl_dataset_dict[name]
-    dataset = dataset_class(root, transform=transform)
-    if name != 'ppi':
-        dataset = [dataset, None, None, None]
-
-    return dataset
-
-
 def get_wiki_cs(root, transform=NormalizeFeatures()):
     data = json.load(open('{}/wiki_cs/data.json'.format(root)))
     features = torch.FloatTensor(np.array(data['features']))
@@ -61,4 +43,22 @@ def get_ppi(root, transform=None):
     g = list(GraphDataLoader(train_val_dataset, batch_size=22, shuffle=True))
 
     return g, PPIDataset(mode='train', raw_dir=root), PPIDataset(mode='valid', raw_dir=root), test_dataset
+
+
+def get_dataset(root, name, transform=NormalizeFeatures()):
+    dgl_dataset_dict = {
+        'coauthor_cs': CoauthorCSDataset,
+        'coauthor_physics': CoauthorPhysicsDataset,
+        'amazon_computers': AmazonCoBuyComputerDataset,
+        'amazon_photos': AmazonCoBuyPhotoDataset,
+        'wiki_cs': get_wiki_cs,
+        'ppi': get_ppi
+    }
+
+    dataset_class = dgl_dataset_dict[name]
+    dataset = dataset_class(root, transform=transform)
+    if name != 'ppi':
+        dataset = [dataset, None, None, None]
+
+    return dataset
 

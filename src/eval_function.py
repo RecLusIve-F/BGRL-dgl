@@ -1,9 +1,9 @@
-import numpy as np
 import torch
+import numpy as np
 from sklearn import metrics
+from sklearn.multiclass import OneVsRestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV, ShuffleSplit, train_test_split
-from sklearn.multiclass import OneVsRestClassifier
 from sklearn.preprocessing import OneHotEncoder, normalize
 
 
