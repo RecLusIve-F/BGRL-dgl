@@ -4,3 +4,4 @@ __pycache__
 weights
 results
 .DS_Store
+local_README.md
