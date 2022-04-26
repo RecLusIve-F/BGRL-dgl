@@ -15,6 +15,18 @@ torch 1.10.2
 scikit-learn 1.0.2
 ```
 
+### Dataset
+The WikiCS Dataset is built from [here](https://github.com/pmernyei/wiki-cs-dataset) and others are DGL's built-in Dataset. Dataset summary:
+
+|     Dataset      |     Task     | Nodes  |  Edges  | Features |     Classes     |
+|:----------------:|:------------:|:------:|:-------:|:--------:|:---------------:|
+|      WikiCS      | Transductive | 11,701 | 216,123 |   300    |       10        |
+| Amazon Computers | Transductive | 13,752 | 245,861 |   767    |       10        |
+|  Amazon Photos   | Transductive | 7,650  | 119,081 |   745    |        8        |
+|   Coauthor CS    | Transductive | 18,333 | 81,894  |  6,805   |       15        |
+| Coauthor Physics | Transductive | 34,493 | 247,962 |  8,415   |        5        |
+|  PPI(24 graphs)  |  Inductive   | 56,944 | 818,716 |    50    | 121(multilabel) |
+
 ### Usage
 
 ##### Dataset options
@@ -81,13 +93,13 @@ python main.py --dataset ppi --graph_encoder_layer 512 512 --drop_edge_p 0.3 0.2
 ### Performance
 
 ##### Transductive Task
-|        Dataset         | WikiCS | Am. Comp. | Am. Photos | Co. CS | Co. Phy |
-| :--------------------: | :----: | :-------: | :--------: | :----: | :-----: |
-|   Accuracy Reported    | 79.98  |   90.34   |   93.17    | 93.31  |  95.73  |
-|      Accuracy DGL      | 78.54  |   89.79   |   92.72    | 92.81  |  95.56  |
+|      Dataset      | WikiCS | Am. Comp. | Am. Photos | Co. CS | Co. Phy |
+|:-----------------:|:------:|:---------:|:----------:|:------:|:-------:|
+| Accuracy Reported | 79.98  |   90.34   |   93.17    | 93.31  |  95.73  |
+|   Accuracy DGL    | 78.54  |   89.79   |   92.72    | 92.81  |  95.56  |
 
 ##### Inductive Task
-|        Dataset         |  PPI  |
-| :--------------------: | :---: |
-|   Micro-F1 Reported    | 69.41 |
-|      Micro-F1 DGL      | 68.65 |
+|      Dataset      |  PPI  |
+|:-----------------:|:-----:|
+| Micro-F1 Reported | 69.41 |
+|   Micro-F1 DGL    | 68.65 |
