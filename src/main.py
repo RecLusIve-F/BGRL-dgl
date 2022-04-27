@@ -1,4 +1,5 @@
 import os
+import dgl
 import copy
 import torch
 import numpy as np
@@ -17,7 +18,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-def train(step, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data):
+def train(step, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data, args):
     model.train()
 
     # update learning rate
@@ -32,6 +33,9 @@ def train(step, model, optimizer, lr_scheduler, mm_scheduler, transform_1, trans
     optimizer.zero_grad()
 
     x1, x2 = transform_1(data), transform_2(data)
+
+    if args.dataset != 'ppi':
+        x1, x2 = dgl.add_self_loop(x1), dgl.add_self_loop(x2)
 
     q1, y2 = model(x1, x2)
     q2, y1 = model(x2, x1)

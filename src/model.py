@@ -84,7 +84,7 @@ class GCN(nn.Module):
 
         self.layers = nn.ModuleList()
         for in_dim, out_dim in zip(layer_sizes[:-1], layer_sizes[1:]):
-            self.layers.append(GraphConv(in_dim, out_dim, allow_zero_in_degree=True))
+            self.layers.append(GraphConv(in_dim, out_dim))
             self.layers.append(BatchNorm1d(out_dim, momentum=batch_norm_mm))
             self.layers.append(nn.PReLU())
 
