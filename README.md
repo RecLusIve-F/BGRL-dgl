@@ -103,5 +103,5 @@ python main.py --dataset ppi --graph_encoder_layer 512 512 --drop_edge_p 0.3 0.2
 |        Dataset         |  PPI  |
 | :--------------------: | :---: |
 |   Micro-F1 Reported    | 69.41 |
-| Accuracy Official code |       |
+| Accuracy Official code | 68.83 |
 |      Micro-F1 DGL      | 68.65 |
