@@ -106,5 +106,7 @@ python main.py --dataset ppi --graph_encoder_layer 512 512 --drop_edge_p 0.3 0.2
 | Accuracy Official code | 68.83 |
 |      Micro-F1 DGL      | 68.65 |
 
-Accuracy reported is over 20 random dataset splits and model initializations and Micro-F1 reported is over 20 random model initializations.
-Accuracy official code and Accuracy DGL is only over 1 random dataset splits and model initializations and Micro-F1 official code and Micro-F1 DGL is only over 1 random model initializations.
+
+##### Accuracy reported is over 20 random dataset splits and model initializations and Micro-F1 reported is over 20 random model initializations.
+
+##### Accuracy official code and Accuracy DGL is only over 1 random dataset splits and model initializations and Micro-F1 official code and Micro-F1 DGL is only over 1 random model initializations.
