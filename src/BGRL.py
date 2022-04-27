@@ -1,3 +1,4 @@
+import dgl
 import copy
 import torch
 from torch import nn
@@ -65,6 +66,7 @@ def compute_representations(net, dataset, device):
 
     if len(dataset) == 1:
         data = dataset[0]
+        data = dgl.add_self_loop(data)
         data = data.to(device)
         with torch.no_grad():
             reps.append(net(data))
