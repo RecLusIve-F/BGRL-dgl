@@ -116,7 +116,7 @@ def main(args):
             else:
                 print('Epoch: {:04d} | Test Accuracy: {:.4f}'.format(epoch, np.mean(test_scores)))
 
-    with open('results/{}.txt'.format(args.dataset), 'w') as f:
+    with open('../results/{}.txt'.format(args.dataset), 'w') as f:
         f.write('{}, {}\n'.format(np.mean(test_scores), np.std(test_scores)))
 
     # save encoder weights
