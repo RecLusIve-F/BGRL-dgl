@@ -107,7 +107,7 @@ def main(args):
     val_scores, test_scores = [], []
     # train
     for epoch in tqdm(range(1, args.epochs + 1), desc='  - (Training)  '):
-        train(epoch - 1, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data)
+        train(epoch - 1, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data, args)
         if epoch % args.eval_epochs == 0:
             val_scores, test_scores = eval(model, dataset, device, args, train_masks, val_masks, test_masks)
             if args.dataset == 'ppi':
