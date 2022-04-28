@@ -1,7 +1,4 @@
 .idea
 data
 __pycache__
-weights
-results
 .DS_Store
-local_README.md

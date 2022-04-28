@@ -93,18 +93,18 @@ python main.py --dataset ppi --graph_encoder_layer 512 512 --drop_edge_p 0.3 0.2
 ### Performance
 
 ##### Transductive Task
-|        Dataset         | WikiCS | Am. Comp. | Am. Photos | Co. CS | Co. Phy |
-|:----------------------:|:------:|:---------:|:----------:|:------:|:-------:|
-|   Accuracy Reported    | 79.98  |   90.34   |   93.17    | 93.31  |  95.73  |
-| Accuracy Official code | 79.94  |   90.62   |   93.45    | 93.42  |  95.74  |
-|      Accuracy DGL      | 78.54  |   90.64   |   93.34    | 93.76  |  95.79  |
+|        Dataset         |    WikiCS    |  Am. Comp.   |  Am. Photos  |    Co. CS    |   Co. Phy    |
+|:----------------------:|:------------:|:------------:|:------------:|:------------:|:------------:|
+|   Accuracy Reported    | 79.98 ± 0.10 | 90.34 ± 0.19 | 93.17 ± 0.30 | 93.31 ± 0.13 | 95.73 ± 0.05 |
+| Accuracy Official code |    79.94     |    90.62     |    93.45     |    93.42     |    95.74     |
+|      Accuracy DGL      |    78.54     |    90.64     |    93.34     |    93.76     |    95.79     |
 
 ##### Inductive Task
-|        Dataset         |  PPI  |
-|:----------------------:|:-----:|
-|   Micro-F1 Reported    | 69.41 |
-| Accuracy Official code | 68.83 |
-|      Micro-F1 DGL      | 68.65 |
+|        Dataset         |     PPI      |
+|:----------------------:|:------------:|
+|   Micro-F1 Reported    | 69.41 ± 0.15 |
+| Accuracy Official code |    68.83     |
+|      Micro-F1 DGL      |    68.65     |
 
 
 ##### Accuracy reported is over 20 random dataset splits and model initializations and Micro-F1 reported is over 20 random model initializations.

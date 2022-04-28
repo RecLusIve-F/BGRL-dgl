@@ -28,7 +28,7 @@ def get_wiki_cs(root, transform=NormalizeFeatures()):
     std, mean = torch.std_mean(g.ndata['feat'], dim=0, unbiased=False)
     g.ndata['feat'] = (g.ndata['feat'] - mean) / std
 
-    return g, train_masks, val_masks, test_mask
+    return [g], train_masks, val_masks, test_mask
 
 
 def get_ppi(root, transform=None):
@@ -56,8 +56,10 @@ def get_dataset(root, name, transform=NormalizeFeatures()):
     }
 
     dataset_class = dgl_dataset_dict[name]
-    dataset = dataset_class(root, transform=transform)
-    if name != 'ppi':
-        dataset = [dataset, None, None, None]
+    train_masks, val_masks, test_mask = None, None, None
+    if name not in ['ppi', 'wiki_cs']:
+        dataset = dataset_class(root, transform=transform)
+    else:
+        dataset, train_masks, val_masks, test_mask = dataset_class(root, transform=transform)
 
-    return dataset
+    return dataset, train_masks, val_masks, test_mask
