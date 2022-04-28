@@ -97,7 +97,7 @@ python main.py --dataset ppi --graph_encoder_layer 512 512 --drop_edge_p 0.3 0.2
 |:----------------------:|:------:|:---------:|:----------:|:------:|:-------:|
 |   Accuracy Reported    | 79.98  |   90.34   |   93.17    | 93.31  |  95.73  |
 | Accuracy Official code | 79.94  |   90.62   |   93.45    | 93.42  |  95.74  |
-|      Accuracy DGL      | 78.54  |   89.79   |   93.34    | 92.81  |  95.56  |
+|      Accuracy DGL      | 78.54  |   90.64   |   93.34    | 93.76  |  95.79  |
 
 ##### Inductive Task
 |        Dataset         |  PPI  |

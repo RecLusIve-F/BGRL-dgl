@@ -28,7 +28,7 @@ def get_wiki_cs(root, transform=NormalizeFeatures()):
     std, mean = torch.std_mean(g.ndata['feat'], dim=0, unbiased=False)
     g.ndata['feat'] = (g.ndata['feat'] - mean) / std
 
-    return [g], train_masks, val_masks, test_mask
+    return g, train_masks, val_masks, test_mask
 
 
 def get_ppi(root, transform=None):
@@ -61,4 +61,3 @@ def get_dataset(root, name, transform=NormalizeFeatures()):
         dataset = [dataset, None, None, None]
 
     return dataset
-
