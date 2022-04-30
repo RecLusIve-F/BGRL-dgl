@@ -97,8 +97,8 @@ def main(args):
 
     results = []
 
-    for repeat in range(20):
-        args.data_seed = repeat
+    for repeat in range(args.num_experiments):
+        args.data_seed = repeat + 1
         # build networks
         if args.dataset == 'ppi':
             encoder = GraphSAGE_GCN([input_size] + args.graph_encoder_layer)
@@ -125,7 +125,10 @@ def main(args):
         del model, encoder, predictor, optimizer
         gc.collect()
 
-    with open('../results/{}-20exp.txt'.format(args.dataset), 'w') as f:
+    if not os.path.isdir('../results'):
+        os.mkdir('../results')
+
+    with open('../results/{}-{}exp.txt'.format(args.dataset, args.num_experiments), 'w') as f:
         f.write('{}, {}\n'.format(np.mean(results), np.std(results)))
 
     # save encoder weights
@@ -166,6 +169,9 @@ if __name__ == '__main__':
     parser.add_argument('--eval_epochs', type=int, default=250)
     parser.add_argument('--num_eval_splits', type=int, default=20)
     parser.add_argument('--data_seed', type=int, default=1)
+
+    # Experiment options.
+    parser.add_argument('--num_experiments', type=int, default=20)
 
     args = parser.parse_args()
 
