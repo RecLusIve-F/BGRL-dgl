@@ -1,5 +1,4 @@
 import os
-import gc
 import dgl
 import copy
 import torch
@@ -52,25 +51,26 @@ def train(step, model, optimizer, lr_scheduler, mm_scheduler, transform_1, trans
     return loss.item()
 
 
-def eval(model, dataset, device, args, train_masks=None, val_masks=None, test_masks=None):
+def eval(model, dataset, device, args, train_data, val_data, test_data):
     # make temporary copy of encoder
     tmp_encoder = copy.deepcopy(model.online_encoder).eval()
-    representations, labels = compute_representations(tmp_encoder, dataset, device)
     val_scores = None
 
     if args.dataset == 'ppi':
-        train_data = compute_representations(tmp_encoder, train_masks, device)
-        val_data = compute_representations(tmp_encoder, val_masks, device)
-        test_data = compute_representations(tmp_encoder, test_masks, device)
+        train_data = compute_representations(tmp_encoder, train_data, device)
+        val_data = compute_representations(tmp_encoder, val_data, device)
+        test_data = compute_representations(tmp_encoder, test_data, device)
         num_classes = train_data[1].shape[1]
         val_scores, test_scores = fit_ppi_linear(num_classes, train_data, val_data, test_data, device,
                                                  args.num_eval_splits)
     elif args.dataset != 'wiki_cs':
+        representations, labels = compute_representations(tmp_encoder, dataset, device)
         test_scores = fit_logistic_regression(representations.cpu().numpy(), labels.cpu().numpy(),
                                               data_random_seed=args.data_seed, repeat=args.num_eval_splits)
     else:
+        representations, labels = compute_representations(tmp_encoder, dataset, device)
         test_scores = fit_logistic_regression_preset_splits(representations.cpu().numpy(), labels.cpu().numpy(),
-                                                            train_masks, val_masks, test_masks)
+                                                            train_data, val_data, test_data)
 
     return val_scores, test_scores
 
@@ -80,12 +80,12 @@ def main(args):
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     print('Using device:', device)
 
-    dataset, train_masks, val_masks, test_masks = get_dataset(args.dataset_dir, args.dataset)
+    dataset, train_data, val_data, test_data = get_dataset(args.dataset_dir, args.dataset)
 
-    data = dataset[0]
-    data = data.to(device)
+    g = dataset[0]
+    g = g.to(device)
 
-    input_size, representation_size = data.ndata['feat'].size(1), args.graph_encoder_layer[-1]
+    input_size, representation_size = g.ndata['feat'].size(1), args.graph_encoder_layer[-1]
 
     # prepare transforms
     transform_1 = get_graph_drop_transform(drop_edge_p=args.drop_edge_p[0], feat_mask_p=args.feat_mask_p[0])
@@ -95,47 +95,33 @@ def main(args):
     lr_scheduler = CosineDecayScheduler(args.lr, args.lr_warmup_epochs, args.epochs)
     mm_scheduler = CosineDecayScheduler(1 - args.mm, 0, args.epochs)
 
-    results = []
+    # build networks
+    if args.dataset == 'ppi':
+        encoder = GraphSAGE_GCN([input_size] + args.graph_encoder_layer)
+    else:
+        encoder = GCN([input_size] + args.graph_encoder_layer)
+    predictor = MLP_Predictor(representation_size, representation_size, hidden_size=args.predictor_hidden_size)
+    model = BGRL(encoder, predictor).to(device)
 
-    for repeat in range(args.num_experiments):
-        args.data_seed = repeat + 1
-        # build networks
-        if args.dataset == 'ppi':
-            encoder = GraphSAGE_GCN([input_size] + args.graph_encoder_layer)
-        else:
-            encoder = GCN([input_size] + args.graph_encoder_layer)
-        predictor = MLP_Predictor(representation_size, representation_size, hidden_size=args.predictor_hidden_size)
-        model = BGRL(encoder, predictor).to(device)
+    # optimizer
+    optimizer = AdamW(model.trainable_parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
-        # optimizer
-        optimizer = AdamW(model.trainable_parameters(), lr=args.lr, weight_decay=args.weight_decay)
-
-        val_scores, test_scores = [], []
-        # train
-        for epoch in tqdm(range(1, args.epochs + 1), desc='  - (Training)  '):
-            train(epoch - 1, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, data, args)
-            if epoch % args.eval_epochs == 0:
-                val_scores, test_scores = eval(model, dataset, device, args, train_masks, val_masks, test_masks)
-                if args.dataset == 'ppi':
-                    print('Epoch: {:04d} | Best Val F1: {:.4f} | Test F1: {:.4f}'.format(epoch, np.mean(val_scores),
-                                                                                         np.mean(test_scores)))
-                else:
-                    print('Epoch: {:04d} | Test Accuracy: {:.4f}'.format(epoch, np.mean(test_scores)))
-        results.append(np.mean(test_scores))
-        del model, encoder, predictor, optimizer
-        gc.collect()
-
-    if not os.path.isdir('../results'):
-        os.mkdir('../results')
-
-    with open('../results/{}-{}exp.txt'.format(args.dataset, args.num_experiments), 'w') as f:
-        f.write('{}, {}\n'.format(np.mean(results), np.std(results)))
+    # train
+    for epoch in tqdm(range(1, args.epochs + 1), desc='  - (Training)  '):
+        train(epoch - 1, model, optimizer, lr_scheduler, mm_scheduler, transform_1, transform_2, g, args)
+        if epoch % args.eval_epochs == 0:
+            val_scores, test_scores = eval(model, dataset, device, args, train_data, val_data, test_data)
+            if args.dataset == 'ppi':
+                print('Epoch: {:04d} | Best Val F1: {:.4f} | Test F1: {:.4f}'.format(epoch, np.mean(val_scores),
+                                                                                     np.mean(test_scores)))
+            else:
+                print('Epoch: {:04d} | Test Accuracy: {:.4f}'.format(epoch, np.mean(test_scores)))
 
     # save encoder weights
-    # if not os.path.isdir(args.weights_dir):
-    #     os.mkdir(args.weights_dir)
-    # torch.save({'model': model.online_encoder.state_dict()}, os.path.join(args.weights_dir,
-    #                                                                       'bgrl-{}.pt'.format(args.dataset)))
+    if not os.path.isdir(args.weights_dir):
+        os.mkdir(args.weights_dir)
+    torch.save({'model': model.online_encoder.state_dict()}, os.path.join(args.weights_dir,
+                                                                          'bgrl-{}.pt'.format(args.dataset)))
 
 
 if __name__ == '__main__':

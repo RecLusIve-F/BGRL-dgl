@@ -1,6 +1,6 @@
-# DGL Implementations of BGRL
+# DGL Implementation of BGRL
 
-This DGL example implements the GNN model proposed in the paper [Large-Scale Representation Learning on Graphs via Bootstrapping](https://arxiv.org/abs/2102.06514). For the original implementation, see [here](https://github.com/nerdslab/bgrl).
+This DGL example implements the GNN experiment proposed in the paper [Large-Scale Representation Learning on Graphs via Bootstrapping](https://arxiv.org/abs/2102.06514). For the original implementation, see [here](https://github.com/nerdslab/bgrl).
 
 Contributor: [RecLusIve-F](https://github.com/RecLusIve-F)
 
@@ -16,7 +16,7 @@ scikit-learn 1.0.2
 ```
 
 ### Dataset
-The WikiCS Dataset is built from [here](https://github.com/pmernyei/wiki-cs-dataset) and others are DGL's built-in Dataset. Dataset summary:
+The WikiCS dataset is built from [here](https://github.com/pmernyei/wiki-cs-dataset) and others are DGL's built-in dataset. Dataset summary:
 
 |     Dataset      |     Task     | Nodes  |  Edges  | Features |     Classes     |
 |:----------------:|:------------:|:------:|:-------:|:--------:|:---------------:|
@@ -31,37 +31,37 @@ The WikiCS Dataset is built from [here](https://github.com/pmernyei/wiki-cs-data
 
 ##### Dataset options
 ```
---dataset                     str         The graph dataset name.              Default is 'Amazon Photos'.
---dataset_dir                 str         Where the dataset resides.           Default is '../data'.
+--dataset                     str         The graph dataset name.                         Default is 'amazon_photos'.
+--dataset_dir                 str         Where the dataset resides.                      Default is '../data'.
 ```
 
 ##### Model options
 ```
---graph_encoder_layer         list        Convolutional layer sizes.           Default is [256, 128].
---predictor_hidden_size       int         Hidden size of predictor.            Default is 512.
+--graph_encoder_layer         list        Convolutional layer hidden sizes.               Default is [256, 128].
+--predictor_hidden_size       int         Hidden size of predictor.                       Default is 512.
 ```
 
 ##### Training options
 ```
---epochs                      int         The number of training epochs.       Default is 10000.
---lr                          float       The learning rate.                   Default is 0.00001.
---weight_decay                float       The weight decay.                    Default is 0.00001.
---mm                          float       The momentum for moving average.     Default is 0.99.
---lr_warmup_epochs            int         Warmup period for learning rate.     Default is 1000.    
---weights_dir                 str         Where to save the weights.           Default is '../weights'.
+--epochs                      int         The number of training epochs.                  Default is 10000.
+--lr                          float       The learning rate.                              Default is 0.00001.
+--weight_decay                float       The weight decay.                               Default is 0.00001.
+--mm                          float       The momentum for moving average.                Default is 0.99.
+--lr_warmup_epochs            int         Warmup period for learning rate scheduling.     Default is 1000.    
+--weights_dir                 str         Where to save the weights.                      Default is '../weights'.
 ```
 
-##### Augmentations options
+##### Augmentation options
 ```
---drop_edge_p                 float      Probability of edge dropout.          Default is [0., 0.].
---feat_mask_p                 float      Probability of node feature masking.  Default is [0., 0.].
+--drop_edge_p                 float      Probability of edge dropout.                     Default is [0., 0.].
+--feat_mask_p                 float      Probability of node feature masking.             Default is [0., 0.].
 ```
 
 ##### Evaluation options
 ```
---eval_epochs                 int        Evaluate every eval_epochs.          Default is 250.
---num_eval_splits             int        Number of evaluation splits.         Default is 20.
---data_seed                   int        Data split seed for evaluation.      Default is 1.
+--eval_epochs                 int        Evaluate every eval_epochs.                      Default is 250.
+--num_eval_splits             int        Number of evaluation splits.                     Default is 20.
+--data_seed                   int        Data split seed for evaluation.                  Default is 1.
 ```
 
 ### Instructions for experiments
@@ -96,17 +96,17 @@ python main.py --dataset ppi --graph_encoder_layer 512 512 --drop_edge_p 0.3 0.2
 |        Dataset         |    WikiCS    |  Am. Comp.   |  Am. Photos  |    Co. CS    |   Co. Phy    |
 |:----------------------:|:------------:|:------------:|:------------:|:------------:|:------------:|
 |   Accuracy Reported    | 79.98 ± 0.10 | 90.34 ± 0.19 | 93.17 ± 0.30 | 93.31 ± 0.13 | 95.73 ± 0.05 |
-| Accuracy Official code |    79.94     |    90.62     |    93.45     |    93.42     |    95.74     |
+| Accuracy Official Code |    79.94     |    90.62     |    93.45     |    93.42     |    95.74     |
 |      Accuracy DGL      |    80.00     |    90.64     |    93.34     |    93.76     |    95.79     |
 
 ##### Inductive Task
 |        Dataset         |     PPI      |
 |:----------------------:|:------------:|
 |   Micro-F1 Reported    | 69.41 ± 0.15 |
-| Accuracy Official code |    68.83     |
+| Accuracy Official Code |    68.83     |
 |      Micro-F1 DGL      |    68.65     |
 
 
 ##### Accuracy reported is over 20 random dataset splits and model initializations and Micro-F1 reported is over 20 random model initializations.
 
-##### Accuracy official code and Accuracy DGL is only over 1 random dataset splits and model initializations and Micro-F1 official code and Micro-F1 DGL is only over 1 random model initializations.
+##### Accuracy official code and Accuracy DGL is only over 1 random dataset splits and model initialization and Micro-F1 official code and Micro-F1 DGL is only over 1 random model initialization.

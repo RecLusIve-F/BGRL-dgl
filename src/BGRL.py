@@ -65,19 +65,19 @@ def compute_representations(net, dataset, device):
     labels = []
 
     if len(dataset) == 1:
-        data = dataset[0]
-        data = dgl.add_self_loop(data)
-        data = data.to(device)
+        g = dataset[0]
+        g = dgl.add_self_loop(g)
+        g = g.to(device)
         with torch.no_grad():
-            reps.append(net(data))
-            labels.append(data.ndata['label'])
+            reps.append(net(g))
+            labels.append(g.ndata['label'])
     else:
-        for data in dataset:
+        for g in dataset:
             # forward
-            data = data.to(device)
+            g = g.to(device)
             with torch.no_grad():
-                reps.append(net(data))
-                labels.append(data.ndata['label'])
+                reps.append(net(g))
+                labels.append(g.ndata['label'])
 
     reps = torch.cat(reps, dim=0)
     labels = torch.cat(labels, dim=0)

@@ -56,10 +56,11 @@ def get_dataset(root, name, transform=NormalizeFeatures()):
     }
 
     dataset_class = dgl_dataset_dict[name]
-    train_masks, val_masks, test_mask = None, None, None
+    train_data, val_data, test_data = None, None, None
     if name not in ['ppi', 'wiki_cs']:
         dataset = dataset_class(root, transform=transform)
     else:
-        dataset, train_masks, val_masks, test_mask = dataset_class(root, transform=transform)
+        dataset, train_masks, val_masks, test_masks = dataset_class(root, transform=transform)
 
-    return dataset, train_masks, val_masks, test_mask
+    return dataset, train_data, val_data, test_data
+
