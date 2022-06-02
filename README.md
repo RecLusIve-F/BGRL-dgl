@@ -9,14 +9,14 @@ Contributor: [RecLusIve-F](https://github.com/RecLusIve-F)
 The codebase is implemented in Python 3.8. For version requirement of packages, see below.
 
 ```
-dgl 0.8.1
+dgl 0.8.3
 numpy 1.21.2
 torch 1.10.2
 scikit-learn 1.0.2
 ```
 
 ### Dataset
-The WikiCS dataset is built from [here](https://github.com/pmernyei/wiki-cs-dataset) and others are DGL's built-in dataset. Dataset summary:
+Dataset summary:
 
 |     Dataset      |     Task     | Nodes  |  Edges  | Features |     Classes     |
 |:----------------:|:------------:|:------:|:-------:|:--------:|:---------------:|
@@ -32,7 +32,6 @@ The WikiCS dataset is built from [here](https://github.com/pmernyei/wiki-cs-data
 ##### Dataset options
 ```
 --dataset                     str         The graph dataset name.                         Default is 'amazon_photos'.
---dataset_dir                 str         Where the dataset resides.                      Default is '../data'.
 ```
 
 ##### Model options
@@ -107,6 +106,6 @@ python main.py --dataset ppi --graph_encoder_layer 512 512 --drop_edge_p 0.3 0.2
 |      Micro-F1 DGL      |    68.65     |
 
 
-##### Accuracy reported is over 20 random dataset splits and model initializations and Micro-F1 reported is over 20 random model initializations.
+##### Accuracy reported is over 20 random dataset splits and model initializations. Micro-F1 reported is over 20 random model initializations.
 
-##### Accuracy official code and Accuracy DGL is only over 1 random dataset splits and model initialization and Micro-F1 official code and Micro-F1 DGL is only over 1 random model initialization.
+##### Accuracy official code and Accuracy DGL is only over 1 random dataset splits and model initialization. Micro-F1 official code and Micro-F1 DGL is only over 1 random model initialization.

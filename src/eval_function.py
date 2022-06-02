@@ -41,7 +41,7 @@ def fit_logistic_regression(X, y, data_random_seed=1, repeat=1):
     return accuracies
 
 
-def fit_logistic_regression_preset_splits(X, y, train_masks, val_masks, test_mask):
+def fit_logistic_regression_preset_splits(X, y, train_mask, val_mask, test_mask):
     # transform targets to one-hot vector
     one_hot_encoder = OneHotEncoder(categories='auto', sparse=False)
     y = one_hot_encoder.fit_transform(y.reshape(-1, 1)).astype(np.bool)
@@ -50,13 +50,13 @@ def fit_logistic_regression_preset_splits(X, y, train_masks, val_masks, test_mas
     X = normalize(X, norm='l2')
 
     accuracies = []
-    for split_id in range(train_masks.shape[1]):
+    for split_id in range(train_mask.shape[1]):
         # get train/val/test masks
-        train_mask, val_mask = train_masks[:, split_id], val_masks[:, split_id]
+        tmp_train_mask, tmp_val_mask = train_mask[:, split_id], val_mask[:, split_id]
 
         # make custom cv
-        X_train, y_train = X[train_mask], y[train_mask]
-        X_val, y_val = X[val_mask], y[val_mask]
+        X_train, y_train = X[tmp_train_mask], y[tmp_train_mask]
+        X_val, y_val = X[tmp_val_mask], y[tmp_val_mask]
         X_test, y_test = X[test_mask], y[test_mask]
 
         # grid search with one-vs-rest classifiers

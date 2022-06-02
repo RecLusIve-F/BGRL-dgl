@@ -4,13 +4,10 @@ import copy
 import torch
 import numpy as np
 from tqdm import tqdm
-from data import get_dataset
 from torch.optim import AdamW
-from scheduler import CosineDecayScheduler
-from BGRL import BGRL, compute_representations
-from transforms import get_graph_drop_transform
 from torch.nn.functional import cosine_similarity
-from model import GCN, GraphSAGE_GCN, MLP_Predictor
+from utils import get_graph_drop_transform, CosineDecayScheduler, get_dataset
+from model import GCN, GraphSAGE_GCN, MLP_Predictor, BGRL, compute_representations
 from eval_function import fit_logistic_regression, fit_logistic_regression_preset_splits, fit_ppi_linear
 
 
@@ -68,9 +65,13 @@ def eval(model, dataset, device, args, train_data, val_data, test_data):
         test_scores = fit_logistic_regression(representations.cpu().numpy(), labels.cpu().numpy(),
                                               data_random_seed=args.data_seed, repeat=args.num_eval_splits)
     else:
+        g = dataset[0]
+        train_mask = g.ndata['train_mask']
+        val_mask = g.ndata['val_mask']
+        test_mask = g.ndata['test_mask']
         representations, labels = compute_representations(tmp_encoder, dataset, device)
         test_scores = fit_logistic_regression_preset_splits(representations.cpu().numpy(), labels.cpu().numpy(),
-                                                            train_data, val_data, test_data)
+                                                            train_mask, val_mask, test_mask)
 
     return val_scores, test_scores
 
@@ -120,8 +121,8 @@ def main(args):
     # save encoder weights
     if not os.path.isdir(args.weights_dir):
         os.mkdir(args.weights_dir)
-    torch.save({'model': model.online_encoder.state_dict()}, os.path.join(args.weights_dir,
-                                                                          'bgrl-{}.pt'.format(args.dataset)))
+    torch.save({'model': model.online_encoder.state_dict()},
+               os.path.join(args.weights_dir, 'bgrl-{}.pt'.format(args.dataset)))
 
 
 if __name__ == '__main__':
